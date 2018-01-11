@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion 20
+    buildToolsVersion '25.0.0'
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 20
+        versionCode 13
+        versionName "1.1.3"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+}
+
+publish {
+    userOrg = 'litesuits'                                        //bintray.com username
+    groupId = 'com.litesuits'                                    //jcenter url
+    artifactId = 'android-common'                         //library name
+    publishVersion = '1.0.0'                                    //version
+    desc = 'A powerful android common utils library.'           //description
+    website = 'https://litesuits.com'
+}
+
+def libVersion = '1.2.0'
+task makeJar(type: Jar) {
+    // 指定生成的jar名
+    def rootDir = project.getRootDir();
+    def parentDir = project.getRootDir().getParentFile().getAbsolutePath();
+
+    delete 'build/libs/*.*'
+    archiveName 'android-common-' + libVersion + '.jar'
+    destinationDir = file('build/libs')
+    // 从哪里打包class文件
+    from('build/intermediates/classes/release/')
+    // 打包到jar后的目录结构
+    // 去掉不需要打包的目录和文件
+    exclude('test/', 'BuildConfig.class', 'R.class', 'R\$*.class', 'META-INF/')
+}
